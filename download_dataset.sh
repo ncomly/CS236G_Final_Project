@@ -1,11 +1,13 @@
-echo "Downloading Dataset for Talking Therapy Dog Project"
+echo "Download Dataset for Talking Therapy Dog Project"
 mkdir -p data/
 cd data/
 
-echo "Downloading DogFaceNet Dataset"
-wget --no-check-certificate "https://docs.google.com/uc?export=download&id=1bphRTkOb3m-fxyi7lvo9ps_7vO85PCeJ" -O "DogFaceNet_crops.tar"
+echo "DogFaceNet Dataset"
+gdown "https://docs.google.com/uc?export=download&id=1bphRTkOb3m-fxyi7lvo9ps_7vO85PCeJ" -O "DogFaceNet_crops.tar"
+tar -xvf DogFaceNet_crops.tar
 
-echo "Downloading CelebA w/ Landmarks Dataset"
+echo "CelebA w/ Landmarks Dataset"
 
-wget --no-check-certificate "https://docs.google.com/uc?export=download&id=1FdfOkdYWmuahpPOqc0dglV8nvQ5vfCs8" -O "CelebA_with_Landmarks.tar"
+gdown "https://drive.google.com/u/1/uc?id=1FdfOkdYWmuahpPOqc0dglV8nvQ5vfCs8" -O "CelebA_with_Landmarks.tar"
+
 tar -xvf CelebA_with_Landmarks.tar
