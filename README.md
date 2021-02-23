@@ -2,9 +2,6 @@
 ## Unpaired Image-to-Image Translation between Disimilar Image Domains
 Stanford CS 236G Final Project
 
-Nick Comly
-
-
 ### Setup
 Follow these instructions to use this repo.
 #### Environment
