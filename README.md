@@ -5,9 +5,9 @@ Stanford CS 236G Final Project
 Nick Comly
 
 
-#### Setup
+### Setup
 Follow these instructions to use this repo.
-##### Environment
+#### Environment
 First, clone the repo, create a new environment and activate it.
 
 With Conda:
@@ -22,7 +22,7 @@ Then install all required packages:
   $> pip install -r requirements.txt
 ```
 
-##### Dataset
+#### Dataset
 Download the dataset by running the provided script:
 ```
   $> ./download_dataset.sh
