@@ -27,7 +27,7 @@ Download the dataset by running the provided script:
 This will download both the CelebA (w/ Landmarks) and DogFaceNet (cropped) Datasets to the `./data` folder
 
 ### Usage
-For the base implementation of CycleGAN, simply follow the setup above, then open the **TODO** jupyter notebook.
+For the base implementation of CycleGAN, simply follow the setup above, then open the `cycle_gan.ipynb` jupyter notebook.
 
 Update the `data` parameter to be the location of the dataset. Likely `./data` if just running `download_dataset.sh`.
 
