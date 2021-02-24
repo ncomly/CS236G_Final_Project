@@ -9,7 +9,7 @@ First, clone the repo, create a new environment and activate it.
 
 With Conda:
 ```
-  $> conda create --env ENVNAME python=3.8
+  $> conda create --name ENVNAME python=3.8
     ...
   $> conda activate ENVNAME 
 ```
