@@ -9,9 +9,9 @@ First, clone the repo, create a new environment and activate it.
 
 With Conda:
 ```
-  $> conda create --name ENVNAME python=3.8
+  $> conda create --name [ENVNAME] python=3.8
     ...
-  $> conda activate ENVNAME 
+  $> conda activate [ENVNAME] 
 ```
 
 Then install all required packages:
