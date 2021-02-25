@@ -42,6 +42,17 @@ def weights_init(m):
         torch.nn.init.normal_(m.weight, 0.0, 0.02)
         torch.nn.init.constant_(m.bias, 0)
 
+def convert_tensor_images(image_tensor, num_images=25, size=(1, 28, 28)):
+    '''
+    Function for visualizing images: Given a tensor of images, number of images, and
+    size per image, plots and prints the images in an uniform grid.
+    '''
+    image_tensor = (image_tensor + 1) / 2
+    image_shifted = image_tensor
+    image_unflat = image_shifted.detach().cpu().view(-1, *size).squeeze()
+
+    return image_unflat
+
 
 ################################################################################
 # Argument Parser

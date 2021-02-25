@@ -121,11 +121,11 @@ def main(args):
 
                 ## Save Images ##
                 if cur_step % args.display_step == 0:
-                    plt.imshow(real_A.numpy())
+                    plt.imshow(convert_tensor_image(real_A))
                     plt.savefig('test.jpg')
                     print(real_A.shape)
-                    writer.add_image('Real AB', torch.squeeze(torch.cat([real_A, real_B], dim=-1)))
-                    writer.add_image('Fake BA', torch.squeeze(torch.cat([fake_B, fake_A], dim=-1)))
+                    writer.add_image('Real AB', convert_tensor_image(torch.cat([real_A, real_B], dim=-1)))
+                    writer.add_image('Fake BA', convert_tensor_image(torch.cat([fake_B, fake_A], dim=-1)))
 
                 ## Model Saving ##
                 if args.save and cur_step % args.save_step == 0:
