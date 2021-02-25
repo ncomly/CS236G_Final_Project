@@ -43,7 +43,7 @@ def main(args):
     if args.checkpoint:
         print(f'Loading pretrained model: {args.checkpoint}')
         args.save_path = args.checkpoint.replace('.pth', '') + '_'
-        print(f'Save path overwritten to {args.save_path + 'XXX.pth'}')
+        print(f'Save path overwritten to {args.save_path}XXX.pth')
         pre_dict = torch.load(args.checkpoint)
         gen_AB.load_state_dict(pre_dict['gen_AB'])
         gen_BA.load_state_dict(pre_dict['gen_BA'])
@@ -55,7 +55,7 @@ def main(args):
     else:
         if args.save:
             args.save_path += 'cycleGAN_'
-            print(f'Model will be saved to {args.save_path + 'XXX.pth'}')
+            print(f'Model will be saved to {args.save_path}XXX.pth')
         gen_AB = gen_AB.apply(weights_init)
         gen_BA = gen_BA.apply(weights_init)
         disc_A = disc_A.apply(weights_init)
@@ -73,14 +73,14 @@ def main(args):
         cur_step = 0
 
         for epoch in range(args.epochs):
-            print(f'Epoch {epoch}/{args.epoch}')
+            print(f'Epoch {epoch}/{args.epochs}')
             # Dataloader returns the batches
             for real_A, real_B in tqdm(dataloader):
                 real_A = nn.functional.interpolate(real_A, size=target_shape)
                 real_B = nn.functional.interpolate(real_B, size=target_shape)
                 cur_batch_size = len(real_A)
-                real_A = real_A.to(device)
-                real_B = real_B.to(device)
+                real_A = real_A.to(args.device)
+                real_B = real_B.to(args.device)
 
                 ### Update discriminator A ###
                 disc_A_opt.zero_grad() # Zero out the gradient before backpropagation
@@ -107,9 +107,9 @@ def main(args):
                 gen_opt.step() # Update optimizer
 
                 # Keep track of the average discriminator loss
-                mean_discriminator_loss += disc_A_loss.item() / display_step
+                mean_discriminator_loss += disc_A_loss.item() / args.write_step
                 # Keep track of the average generator loss
-                mean_generator_loss += gen_loss.item() / display_step
+                mean_generator_loss += gen_loss.item() / args.write_step
 
                 ### Tensorboard ###
                 if cur_step % args.write_step == 0:
@@ -121,6 +121,9 @@ def main(args):
 
                 ## Save Images ##
                 if cur_step % args.display_step == 0:
+                    plt.imshow(real_A.numpy())
+                    plt.savefig('test.jpg')
+                    print(real_A.shape)
                     writer.add_image('Real AB', torch.squeeze(torch.cat([real_A, real_B], dim=-1)))
                     writer.add_image('Fake BA', torch.squeeze(torch.cat([fake_B, fake_A], dim=-1)))
 

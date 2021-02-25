@@ -8,6 +8,6 @@
     "device": "cuda",
     "write_step": 100,
     "display_step": 200,
-    "save_step": 500,
+    "save_step": 5000,
     "description":"cycleGAN Baseline"
 }
