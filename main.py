@@ -46,6 +46,15 @@ def main(args):
                             a_subroot=celebA_subfolder, 
                             b_subroot=dogFace_subfolder)
 
+    ## Create Generator and Discriminator
+    gen_AB = Generator(dim_A, dim_B).to(device)
+    gen_BA = Generator(dim_B, dim_A).to(device)
+    gen_opt = torch.optim.Adam(list(gen_AB.parameters()) + list(gen_BA.parameters()), lr=lr, betas=(0.5, 0.999))
+    disc_A = Discriminator(dim_A).to(device)
+    disc_A_opt = torch.optim.Adam(disc_A.parameters(), lr=lr, betas=(0.5, 0.999))
+    disc_B = Discriminator(dim_B).to(device)
+    disc_B_opt = torch.optim.Adam(disc_B.parameters(), lr=lr, betas=(0.5, 0.999))
+
     ## Initialize weights
     if pretrained:
         pre_dict = torch.load(model_path)
