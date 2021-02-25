@@ -7,7 +7,7 @@
     "epochs": 20,
     "device": "cuda",
     "write_step": 100,
-    "display_step": 2,
+    "display_step": 200,
     "save_step": 5000,
     "description":"cycleGAN Baseline"
 }
