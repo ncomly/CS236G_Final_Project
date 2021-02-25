@@ -28,9 +28,6 @@ device = 'cuda'
 pretrained = False
 save_model = True
 model_path='models/cycle_gan_600.pth'
-
-## Train
-def train(save_model=False,model_path='./'):
     
 
 ## Main
