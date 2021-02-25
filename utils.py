@@ -15,7 +15,9 @@ from torchvision.utils import make_grid
 from tqdm.auto import tqdm
 
 import os
+import sys
 import glob
+import json
 import random
 import argparse
 import numpy as np
@@ -23,6 +25,9 @@ import matplotlib.pyplot as plt
 from skimage import color
 from PIL import Image
 
+
+from easydict import EasyDict as edict
+from pprint import pprint
 
 torch.manual_seed(0)
 
@@ -46,12 +51,18 @@ def parse_args():
     # Create a parser
     parser = argparse.ArgumentParser(description="Talking Therapy Dog")
     parser.add_argument('--config', default=None, type=str, help='Configuration file')
-    parser.add_argument('--checkpoint', default=None, type=str, help='Model checkpoint file')
+    parser.add_argument('--checkpoint', default=None, type=str, help='Model checkpoint file. If one is not provided, training will start from scratch')
     parser.add_argument('--save_path', default='./models/', type=str, help='Top level directory to store model checkpoints')
-    parser.add_argument('--train', default=False, type=bool, help='True if training')
+    parser.add_argument('--train', action='store_true', help='Will train if provided')
+    parser.add_argument('--nosave', action='store_true', help='Will not save checkpionts if provided')
 
     # Parse the arguments
     args = parser.parse_args()
+
+    # config file
+    if not args.config:
+        print('No config .json file provided. Defaulting to \'config.json\'')
+        args.config = 'config.json'
 
     # Parse the configurations from the config json file provided
     try:
@@ -70,10 +81,10 @@ def parse_args():
         exit(1)
 
     config_args = edict(config_args_dict)
-    config_args.test = True if config_args.test != 0 else False
     config_args.train = args.train
     config_args.save_path = args.save_path
     config_args.checkpoint = args.checkpoint
+    config_args.save = not args.nosave
     
 
     pprint(config_args)

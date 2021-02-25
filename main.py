@@ -5,30 +5,26 @@ from data import *
 
 
 # data locations
-data_folder = "./data"
-celebA_subfolder = "CelebA_50k/"
-dogFace_subfolder = "DogFaceNet_crops/"
+#data_folder = "./data"
+#celebA_subfolder = "CelebA_50k/"
+#dogFace_subfolder = "DogFaceNet_crops/"
 
 
 # runtime params
 adv_criterion = nn.MSELoss() 
 recon_criterion = nn.L1Loss() 
 
-n_epochs = 20
+#n_epochs = 20
 dim_A = 3
 dim_B = 3
-write_step = 100
-display_step = 200
-save_step = 500
-batch_size = 1
-lr = 0.0002
+#write_step = 100
+#display_step = 200
+#save_step = 500
+#batch_size = 1
+#lr = 0.0002
 load_shape = 286
 target_shape = 256
-device = 'cuda'
-pretrained = True
-save_model = True
-model_path='models/cycleGAN_5000.pth'
-train = True
+#device = 'cuda'
     
 
 ## Main
@@ -42,23 +38,24 @@ def main(args):
         transforms.ToTensor(),
     ])
     # get dataset
-    dataset = ImageDataset(data_folder, 
+    dataset = ImageDataset(args.data_folder, 
                             transform=transform, 
-                            a_subroot=celebA_subfolder, 
-                            b_subroot=dogFace_subfolder)
+                            a_subroot=args.A_subfolder, 
+                            b_subroot=args.B_subfolder)
 
     ## Create Generator and Discriminator
-    gen_AB = Generator(dim_A, dim_B).to(device)
-    gen_BA = Generator(dim_B, dim_A).to(device)
-    gen_opt = torch.optim.Adam(list(gen_AB.parameters()) + list(gen_BA.parameters()), lr=lr, betas=(0.5, 0.999))
-    disc_A = Discriminator(dim_A).to(device)
-    disc_A_opt = torch.optim.Adam(disc_A.parameters(), lr=lr, betas=(0.5, 0.999))
-    disc_B = Discriminator(dim_B).to(device)
-    disc_B_opt = torch.optim.Adam(disc_B.parameters(), lr=lr, betas=(0.5, 0.999))
+    gen_AB = Generator(dim_A, dim_B).to(args.device)
+    gen_BA = Generator(dim_B, dim_A).to(args.device)
+    gen_opt = torch.optim.Adam(list(gen_AB.parameters()) + list(gen_BA.parameters()), lr=args.lr, betas=(0.5, 0.999))
+    disc_A = Discriminator(dim_A).to(args.device)
+    disc_A_opt = torch.optim.Adam(disc_A.parameters(), lr=args.lr, betas=(0.5, 0.999))
+    disc_B = Discriminator(dim_B).to(args.device)
+    disc_B_opt = torch.optim.Adam(disc_B.parameters(), lr=args.lr, betas=(0.5, 0.999))
 
     ## Initialize weights
-    if pretrained:
-        pre_dict = torch.load(model_path)
+    if args.checkpoint:
+        print(f'Loading pretrained model: {args.checkpoint}')
+        pre_dict = torch.load(args.checkpoint)
         gen_AB.load_state_dict(pre_dict['gen_AB'])
         gen_BA.load_state_dict(pre_dict['gen_BA'])
         gen_opt.load_state_dict(pre_dict['gen_opt'])
@@ -74,16 +71,17 @@ def main(args):
 
     # Train
 
-    if train:
+    if args.train:
         # Tensorboard summary writer
         writer = SummaryWriter()
 
         mean_generator_loss = 0
         mean_discriminator_loss = 0
-        dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=True)
+        dataloader = DataLoader(dataset, batch_size=args.batch_size, shuffle=True)
         cur_step = 0
 
-        for epoch in range(n_epochs):
+        for epoch in range(args.epochs):
+            print(f'Epoch {epoch}/{args.epoch}')
             # Dataloader returns the batches
             for real_A, real_B in tqdm(dataloader):
                 real_A = nn.functional.interpolate(real_A, size=target_shape)
@@ -122,7 +120,7 @@ def main(args):
                 mean_generator_loss += gen_loss.item() / display_step
 
                 ### Tensorboard ###
-                if cur_step % write_step == 0:
+                if cur_step % args.write_step == 0:
                     writer.add_scalar("Mean Generator Loss", mean_generator_loss, cur_step)
                     writer.add_scalar("Mean Discriminator Loss", mean_generator_loss, cur_step)
 
@@ -130,12 +128,12 @@ def main(args):
                     mean_discriminator_loss = 0
 
                 ## Save Images ##
-                if cur_step % display_step == 0:
+                if cur_step % args.display_step == 0:
                     writer.add_image('Real AB', torch.squeeze(torch.cat([real_A, real_B], dim=-1)))
                     writer.add_image('Fake BA', torch.squeeze(torch.cat([fake_B, fake_A], dim=-1)))
 
                 ## Model Saving ##
-                if save_model and cur_step % save_step == 0:
+                if save_model and cur_step % args.save_step == 0:
                     torch.save({
                         'gen_AB': gen_AB.state_dict(),
                         'gen_BA': gen_BA.state_dict(),
@@ -152,4 +150,8 @@ def main(args):
 
 
 if __name__ == '__main__':
-    main({})
+
+    # get arguments
+    args = parse_args()
+    
+    main(args)
