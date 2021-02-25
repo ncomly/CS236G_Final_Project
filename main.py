@@ -151,6 +151,10 @@ def main(args):
                     mean_discriminator_loss = 0
 
                     val_A, val_B = next(val_gen())
+                    val_A = nn.functional.interpolate(val_A, size=target_shape)
+                    val_B = nn.functional.interpolate(val_B, size=target_shape)
+                    val_A = val_A.to(args.device)
+                    val_B = val_B.to(args.device)
 
                     # Specific Losses
                     # train
