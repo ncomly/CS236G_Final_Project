@@ -121,12 +121,13 @@ def main(args):
 
                 ## Save Images ##
                 if cur_step % args.display_step == 0:
-                    writer.add_image('Real AB', convert_tensor_images(torch.cat([real_A, real_B], dim=-1), size=(dim_A, target_shape, target_shape)))
-                    writer.add_image('Fake BA', convert_tensor_images(torch.cat([fake_B, fake_A], dim=-1), size=(dim_A, target_shape, target_shape)))
+                    print('saving images')
+                    writer.add_image('Real AB', convert_tensor_images(torch.cat([real_A, real_B], dim=-1), size=(dim_A, target_shape, target_shape)), cur_step)
+                    writer.add_image('Fake BA', convert_tensor_images(torch.cat([fake_B, fake_A], dim=-1), size=(dim_A, target_shape, target_shape)), cur_step)
                     writer.flush()
 
                 ## Model Saving ##
-                if args.save and cur_step % args.save_step == 0:
+                if args.save and cur_step % args.save_step == 0 and cur_step > 0:
                     torch.save({
                         'gen_AB': gen_AB.state_dict(),
                         'gen_BA': gen_BA.state_dict(),
