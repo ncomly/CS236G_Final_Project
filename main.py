@@ -27,7 +27,7 @@ target_shape = 218
 device = 'cuda'
 pretrained = True
 save_model = True
-model_path='models/cycleGan_5000.pth'
+model_path='models/cycleGAN_5000.pth'
 train = True
     
 
