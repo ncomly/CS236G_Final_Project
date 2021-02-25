@@ -130,7 +130,7 @@ def main(args):
                 ### Update generator ###
                 gen_opt.zero_grad()
                 gen_loss, fake_A, fake_B = get_gen_loss(
-                    real_A, real_B, gen_AB, gen_BA, disc_A, disc_B, adv_criterion, recon_criterion, recon_criterion
+                    real_A, real_B, gen_AB, gen_BA, disc_A, disc_B, adv_criterion, recon_criterion, recon_criterion, args.lambda_identity, args.lambda_cycle
                 )
                 gen_loss.backward() # Update gradients
                 gen_opt.step() # Update optimizer
