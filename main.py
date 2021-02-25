@@ -149,7 +149,7 @@ def main(args):
                     mean_generator_loss = 0
                     mean_discriminator_loss = 0
 
-                    val_A, val_B = val_gen.next()
+                    val_A, val_B = next(val_gen())
 
                     # Specific Losses
                     # train
