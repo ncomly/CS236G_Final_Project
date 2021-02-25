@@ -114,7 +114,7 @@ def main(args):
                 ### Tensorboard ###
                 if cur_step % args.write_step == 0:
                     writer.add_scalar("Mean Generator Loss", mean_generator_loss, cur_step)
-                    writer.add_scalar("Mean Discriminator Loss", mean_generator_loss, cur_step)
+                    writer.add_scalar("Mean Discriminator Loss", mean_discriminator_loss, cur_step)
 
                     mean_generator_loss = 0
                     mean_discriminator_loss = 0
