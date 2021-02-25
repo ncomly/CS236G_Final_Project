@@ -131,8 +131,8 @@ def main(args):
 
                 ## Save Images ##
                 if cur_step % display_step == 0:
-                    writer.add_image('Real AB', torch.cat([real_A, real_B]))
-                    writer.add_image('Fake BA', torch.cat([fake_B, fake_A]))
+                    writer.add_image('Real AB', torch.cat([real_A, real_B], dim=-1))
+                    writer.add_image('Fake BA', torch.cat([fake_B, fake_A], dim=-1))
 
                 ## Model Saving ##
                 if save_model and cur_step % save_step == 0:
