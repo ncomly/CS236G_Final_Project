@@ -91,8 +91,9 @@ def main(args):
 
     if args.train:
         # Tensorboard summary writer
-        train_writer = SummaryWriter('train')
-        val_writer = SummaryWriter('val')
+        logdir = 'runs/' + datetime.now().strftime("%d_%m_%Y__%H_%M_%S/")
+        train_writer = SummaryWriter(logdir + 'train')
+        val_writer = SummaryWriter(logdir + 'val')
 
         mean_generator_loss = 0
         mean_discriminator_loss = 0
