@@ -16,6 +16,14 @@ target_shape = 256
 
 ## Main
 def main(args):
+    def get_val_examples():
+        while True:
+            for real_A, real_B in dataloader_val:
+                yield real_A, real_B
+
+
+
+
     ## Load Dataset
     # create transform
     transform = transforms.Compose([
@@ -24,11 +32,29 @@ def main(args):
         transforms.RandomHorizontalFlip(),
         transforms.ToTensor(),
     ])
-    # get dataset
-    dataset = ImageDataset(args.data_folder, 
-                            transform=transform, 
-                            a_subroot=args.A_subfolder, 
-                            b_subroot=args.B_subfolder)
+
+    if args.train:
+        # get dataset
+        dataset_train = ImageDataset(args.data_folder, 
+                                    transform=transform, 
+                                    a_subroot=args.A_subfolder, 
+                                    b_subroot=args.B_subfolder,
+                                    mode='train')
+        dataset_val   = ImageDataset(args.data_folder, 
+                                    transform=transform, 
+                                    a_subroot=args.A_subfolder, 
+                                    b_subroot=args.B_subfolder,
+                                    mode='val')
+        val_gen = get_val_examples
+
+    else:
+        dataset_test  = ImageDataset(args.data_folder, 
+                                    transform=transform, 
+                                    a_subroot=args.A_subfolder, 
+                                    b_subroot=args.B_subfolder,
+                                    mode='test')
+
+
 
     ## Create Generator and Discriminator
     gen_AB = Generator(dim_A, dim_B).to(args.device)
@@ -65,17 +91,20 @@ def main(args):
 
     if args.train:
         # Tensorboard summary writer
-        writer = SummaryWriter()
+        train_writer = SummaryWriter('train')
+        val_writer = SummaryWriter('val')
 
         mean_generator_loss = 0
         mean_discriminator_loss = 0
-        dataloader = DataLoader(dataset, batch_size=args.batch_size, shuffle=True)
+        # initialize Data Loaders
+        dataloader_train = DataLoader(dataset_train, batch_size=args.batch_size, shuffle=True)
+        dataloader_val   = DataLoader(dataset_val,   batch_size=args.batch_size, shuffle=True)
         cur_step = 0
 
         for epoch in range(args.epochs):
             print(f'Epoch {epoch}/{args.epochs}')
             # Dataloader returns the batches
-            for real_A, real_B in tqdm(dataloader):
+            for real_A, real_B in tqdm(dataloader_train):
                 real_A = nn.functional.interpolate(real_A, size=target_shape)
                 real_B = nn.functional.interpolate(real_B, size=target_shape)
                 cur_batch_size = len(real_A)
@@ -107,24 +136,52 @@ def main(args):
                 gen_opt.step() # Update optimizer
 
                 # Keep track of the average discriminator loss
-                mean_discriminator_loss += disc_A_loss.item() / args.write_step
+                mean_discriminator_loss += disc_A_loss.item() / args.val_step
                 # Keep track of the average generator loss
-                mean_generator_loss += gen_loss.item() / args.write_step
+                mean_generator_loss += gen_loss.item() / args.val_step
 
                 ### Tensorboard ###
-                if cur_step % args.write_step == 0:
-                    writer.add_scalar("Mean Generator Loss", mean_generator_loss, cur_step)
-                    writer.add_scalar("Mean Discriminator Loss", mean_discriminator_loss, cur_step)
+                if cur_step % args.val_step == 0:
+                    # Mean Losses
+                    train_writer.add_scalar("Mean Generator Loss", mean_generator_loss, cur_step)
+                    train_writer.add_scalar("Mean Discriminator Loss", mean_discriminator_loss, cur_step)
 
                     mean_generator_loss = 0
                     mean_discriminator_loss = 0
 
+                    val_A, val_B = val_gen.next()
+
+                    # Specific Losses
+                    # train
+                    adv_train, idn_train, cyc_train = get_gen_losses( real_A, real_B, 
+                                                                    gen_AB, gen_BA, 
+                                                                    disc_A, disc_B, 
+                                                                    adv_criterion, 
+                                                                    recon_criterion, 
+                                                                    recon_criterion)
+                    # val
+                    adv_val, idn_val, cyc_val = get_gen_losses( val_A, val_B, 
+                                                                gen_AB, gen_BA, 
+                                                                disc_A, disc_B, 
+                                                                adv_criterion, 
+                                                                recon_criterion, 
+                                                                recon_criterion)
+
+                    #Write
+                    train_writer.add_scalar("Adversarial Loss", adv_train, cur_step)
+                    train_writer.add_scalar("Identity Loss", idn_train, cur_step)
+                    train_writer.add_scalar("Cycle-Consistency Loss", idn_train, cur_step)
+
+                    val_writer.add_scalar("Adversarial Loss", adv_val, cur_step)
+                    val_writer.add_scalar("Identity Loss", idn_val, cur_step)
+                    val_writer.add_scalar("Cycle-Consistency Loss", idn_val, cur_step)
+
+
                 ## Save Images ##
                 if cur_step % args.display_step == 0:
                     print('saving images')
-                    writer.add_image('Real AB', convert_tensor_images(torch.cat([real_A, real_B], dim=-1), size=(dim_A, target_shape, target_shape)), cur_step)
-                    writer.add_image('Fake BA', convert_tensor_images(torch.cat([fake_B, fake_A], dim=-1), size=(dim_A, target_shape, target_shape)), cur_step)
-                    writer.flush()
+                    train_writer.add_image('Real AB', convert_tensor_images(torch.cat([real_A, real_B], dim=-1), size=(dim_A, target_shape, target_shape)), cur_step)
+                    train_writer.add_image('Fake BA', convert_tensor_images(torch.cat([fake_B, fake_A], dim=-1), size=(dim_A, target_shape, target_shape)), cur_step)
 
                 ## Model Saving ##
                 if args.save and cur_step % args.save_step == 0 and cur_step > 0:
@@ -140,7 +197,7 @@ def main(args):
                 cur_step += 1
 
 
-        writer.flush()
+            train_writer.flush()
 
 
 if __name__ == '__main__':

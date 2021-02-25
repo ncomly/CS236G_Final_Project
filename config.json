@@ -6,8 +6,8 @@
     "batch_size": 1,
     "epochs": 20,
     "device": "cuda",
-    "write_step": 100,
-    "display_step": 200,
+    "display_step": 500,
     "save_step": 5000,
+    "val_step" : 250,
     "description":"cycleGAN Baseline"
 }

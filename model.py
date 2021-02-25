@@ -303,13 +303,27 @@ def get_gen_loss(real_A, real_B, gen_AB, gen_BA, disc_A, disc_B, adv_criterion, 
 
     # Cycle-consistency Loss -- get_cycle_consistency_loss(real_X, fake_Y, gen_YX, cycle_criterion)
     cyc_loss_BA, cyc_BA = get_cycle_consistency_loss(real_A, fake_B, gen_BA, cycle_criterion)
-    cyc_loss_AB, cyc_AB= get_cycle_consistency_loss(real_B, fake_A, gen_AB, cycle_criterion)
+    cyc_loss_AB, cyc_AB = get_cycle_consistency_loss(real_B, fake_A, gen_AB, cycle_criterion)
 
     # Total loss
     gen_loss = adv_loss_AB + adv_loss_BA \
                 + lambda_identity*(idn_loss_AB + idn_loss_BA) \
                 + lambda_cycle*(cyc_loss_AB + cyc_loss_BA)
     return gen_loss, fake_A, fake_B
+
+## Individual Losses ##
+def get_gen_losses(real_A, real_B, gen_AB, gen_BA, disc_A, disc_B, adv_criterion, identity_criterion, cycle_criterion):
+    # Adversarial Loss
+    adv_loss = get_gen_adversarial_loss(real_A, disc_B, gen_AB, adv_criterion) + \
+                get_gen_adversarial_loss(real_B, disc_A, gen_BA, adv_criterion)
+    # Identity Loss
+    idn_loss = get_identity_loss(real_A, gen_BA, identity_criterion) + \
+                get_identity_loss(real_B, gen_AB, identity_criterion)
+    # Cycle Loss
+    cyc_loss = get_cycle_consistency_loss(real_A, fake_B, gen_BA, cycle_criterion) + \
+                get_cycle_consistency_loss(real_B, fake_A, gen_AB, cycle_criterion)
+
+    return adv_loss, idn_loss, cyc_loss
 
 
 ##### Discriminator Loss #####
