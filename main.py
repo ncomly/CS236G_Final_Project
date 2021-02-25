@@ -4,27 +4,14 @@ from model import *
 from data import *
 
 
-# data locations
-#data_folder = "./data"
-#celebA_subfolder = "CelebA_50k/"
-#dogFace_subfolder = "DogFaceNet_crops/"
-
-
 # runtime params
 adv_criterion = nn.MSELoss() 
 recon_criterion = nn.L1Loss() 
 
-#n_epochs = 20
 dim_A = 3
 dim_B = 3
-#write_step = 100
-#display_step = 200
-#save_step = 500
-#batch_size = 1
-#lr = 0.0002
 load_shape = 286
 target_shape = 256
-#device = 'cuda'
     
 
 ## Main
@@ -55,6 +42,8 @@ def main(args):
     ## Initialize weights
     if args.checkpoint:
         print(f'Loading pretrained model: {args.checkpoint}')
+        args.save_path = args.checkpoint.replace('.pth', '') + '_'
+        print(f'Save path overwritten to {args.save_path + 'XXX.pth'}')
         pre_dict = torch.load(args.checkpoint)
         gen_AB.load_state_dict(pre_dict['gen_AB'])
         gen_BA.load_state_dict(pre_dict['gen_BA'])
@@ -64,6 +53,9 @@ def main(args):
         disc_B.load_state_dict(pre_dict['disc_B'])
         disc_B_opt.load_state_dict(pre_dict['disc_B_opt'])
     else:
+        if args.save:
+            args.save_path += 'cycleGAN_'
+            print(f'Model will be saved to {args.save_path + 'XXX.pth'}')
         gen_AB = gen_AB.apply(weights_init)
         gen_BA = gen_BA.apply(weights_init)
         disc_A = disc_A.apply(weights_init)
@@ -133,7 +125,7 @@ def main(args):
                     writer.add_image('Fake BA', torch.squeeze(torch.cat([fake_B, fake_A], dim=-1)))
 
                 ## Model Saving ##
-                if save_model and cur_step % args.save_step == 0:
+                if args.save and cur_step % args.save_step == 0:
                     torch.save({
                         'gen_AB': gen_AB.state_dict(),
                         'gen_BA': gen_BA.state_dict(),
@@ -142,7 +134,7 @@ def main(args):
                         'disc_A_opt': disc_A_opt.state_dict(),
                         'disc_B': disc_B.state_dict(),
                         'disc_B_opt': disc_B_opt.state_dict()
-                    }, f"{model_path}cycleGAN_{cur_step}.pth")
+                    }, f"{args.save_path}{cur_step}.pth")
                 cur_step += 1
 
 
