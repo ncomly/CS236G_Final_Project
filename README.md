@@ -37,5 +37,5 @@ There are multiple arguments for `main.py`, but the only required argument to tr
 
 As of now, test mode has not been implemented
 
-In addition, the main function takes in a configuration file like `config.json` which specifies data location, number of epochs, learning rate, loss weights, etc.
+In addition, the main function takes in a configuration file, defaults to `config.json`, which specifies data location, number of epochs, learning rate, loss weights, etc.
 The config file can be specified via `--config [CONFIG JSON]`.
