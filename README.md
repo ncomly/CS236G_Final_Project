@@ -1,8 +1,7 @@
-# Talking Therapy Dog
-## Unpaired Image-to-Image Translation between Disimilar Image Domains
+# Talking Therapy Dog: Unpaired Image-to-Image Translation between Disimilar Image Domains
 Stanford CS 236G Final Project
 
-### Setup
+## Setup
 Follow these instructions to use this repo.
 #### Environment
 First, clone the repo, create a new environment and activate it.
@@ -26,9 +25,17 @@ Download the dataset by running the provided script:
 ```
 This will download both the CelebA (w/ Landmarks) and DogFaceNet (cropped) Datasets to the `./data` folder
 
-### Usage
-For the base implementation of CycleGAN, simply follow the setup above, then open the `cycle_gan.ipynb` jupyter notebook.
+## Usage
+For the base implementation of CycleGAN, first follow the setup above to prepare the environment and download the dataset.
 
-Update the `data` parameter to be the location of the dataset. Likely `./data` if just running `download_dataset.sh`.
+The full model is compartmentalized into multiple aptly named files. The full CycleGAN model is run via `main.py`. 
 
-Run through the building of the model and then train during the last cell.
+There are multiple arguments for `main.py`, but the only required argument to train is `--train`. So to start training a new model run:
+```
+  $> python main.py --train
+```
+
+As of now, test mode has not been implemented
+
+In addition, the main function takes in a configuration file, defaults to `config.json`, which specifies data location, number of epochs, learning rate, loss weights, etc.
+The config file can be specified via `--config [CONFIG JSON]`.
