@@ -175,11 +175,11 @@ def main(args):
                     #Write
                     train_writer.add_scalar("Adversarial Loss", adv_train, cur_step)
                     train_writer.add_scalar("Identity Loss", idn_train, cur_step)
-                    train_writer.add_scalar("Cycle-Consistency Loss", idn_train, cur_step)
+                    train_writer.add_scalar("Cycle-Consistency Loss", cyc_train, cur_step)
 
                     val_writer.add_scalar("Adversarial Loss", adv_val, cur_step)
                     val_writer.add_scalar("Identity Loss", idn_val, cur_step)
-                    val_writer.add_scalar("Cycle-Consistency Loss", idn_val, cur_step)
+                    val_writer.add_scalar("Cycle-Consistency Loss", cyc_val, cur_step)
 
 
                 ## Save Images ##
