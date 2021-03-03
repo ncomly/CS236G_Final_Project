@@ -5,10 +5,6 @@ from data import *
 
 
 # runtime params
-adv_criterion = nn.MSELoss() 
-recon_criterion = nn.L1Loss() 
-inception_criterion = partial()
-
 dim_A = 3
 dim_B = 3
 load_shape = 100
@@ -17,10 +13,12 @@ target_shape = 100
 
 ## Main
 def main(args):
+    # helper function for getting validation examples
     def get_val_examples():
         while True:
             for real_A, real_B in dataloader_val:
                 yield real_A, real_B
+
 
 
 
@@ -54,6 +52,16 @@ def main(args):
                                     a_subroot=args.A_subfolder, 
                                     b_subroot=args.B_subfolder,
                                     mode='test')
+
+
+    ## Create Criterion
+    # adverarial
+    adv_criterion = nn.MSELoss() 
+    # identity
+    idn_criterion = nn.L1Loss() 
+    # cycle
+    inception_model = get_inception_v3()
+    cyc_criterion = partial(inception_loss(inception_model, nn.L1Loss()))
 
 
 
@@ -132,7 +140,9 @@ def main(args):
                 ### Update generator ###
                 gen_opt.zero_grad()
                 gen_loss, fake_A, fake_B = get_gen_loss(
-                    real_A, real_B, gen_AB, gen_BA, disc_A, disc_B, adv_criterion, recon_criterion, recon_criterion, args.lambda_identity, args.lambda_cycle
+                    real_A, real_B, gen_AB, gen_BA, disc_A, disc_B, 
+                    adv_criterion, idn_criterion, cyc_criterion, 
+                    args.lambda_identity, args.lambda_cycle
                 )
                 gen_loss.backward() # Update gradients
                 gen_opt.step() # Update optimizer
@@ -163,15 +173,15 @@ def main(args):
                                                                     gen_AB, gen_BA, 
                                                                     disc_A, disc_B, 
                                                                     adv_criterion, 
-                                                                    recon_criterion, 
-                                                                    recon_criterion)
+                                                                    idn_criterion, 
+                                                                    cyc_criterion)
                     # val
                     adv_val, idn_val, cyc_val = get_gen_losses( val_A, val_B, 
                                                                 gen_AB, gen_BA, 
                                                                 disc_A, disc_B, 
                                                                 adv_criterion, 
-                                                                recon_criterion, 
-                                                                recon_criterion)
+                                                                idn_criterion, 
+                                                                cyc_criterion)
 
                     #Write
                     train_writer.add_scalar("Adversarial Loss", adv_train, cur_step)
