@@ -10,8 +10,8 @@ recon_criterion = nn.L1Loss()
 
 dim_A = 3
 dim_B = 3
-load_shape = 286
-target_shape = 256
+load_shape = 100
+target_shape = 100
     
 
 ## Main
@@ -184,7 +184,6 @@ def main(args):
 
                 ## Save Images ##
                 if cur_step % args.display_step == 0:
-                    print('saving images')
                     train_writer.add_image('Real AB', convert_tensor_images(torch.cat([real_A, real_B], dim=-1), size=(dim_A, target_shape, target_shape)), cur_step)
                     train_writer.add_image('Fake BA', convert_tensor_images(torch.cat([fake_B, fake_A], dim=-1), size=(dim_A, target_shape, target_shape)), cur_step)
 

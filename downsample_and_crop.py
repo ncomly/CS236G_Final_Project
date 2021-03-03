@@ -5,8 +5,7 @@ import matplotlib.pyplot as plt
 import time
 import tqdm
 
-data_dir = 'C:/Users/nacom/Documents/Datasets/CelebA/img_align_celeba/CelebA_50k/'
-# data_dir = 'C:/Users/nacom/Documents/Datasets/DogFaceNet/after_4_bis/'
+data_dir = './data/CelebA_50k/'
 
 out_res = 100
 
