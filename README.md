@@ -25,6 +25,16 @@ Download the dataset by running the provided script:
 ```
 This will download both the CelebA (w/ Landmarks) and DogFaceNet (cropped) Datasets to the `./data` folder
 
+
+Additionally, for a script needs to be run to resize the CelebA dataset to a square crop and then downsample it.
+
+This can be done by running:
+```
+  $> python downsample_and_crop.py
+```
+
+_Note: If the location of CelebA_50K was changed, the `data_dir` variable will need to be updated as well_
+
 ## Usage
 For the base implementation of CycleGAN, first follow the setup above to prepare the environment and download the dataset.
 
