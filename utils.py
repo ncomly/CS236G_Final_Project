@@ -11,6 +11,7 @@ from torch.utils.tensorboard import SummaryWriter
 import torchvision
 from torchvision import transforms
 from torchvision.utils import make_grid
+from torchvision.models import inception_v3
 
 from tqdm.auto import tqdm
 

@@ -353,3 +353,39 @@ def get_disc_loss(real_X, fake_X, disc_X, adv_criterion):
     # average
     disc_loss = (disc_loss_fake + disc_loss_real) / 2
     return disc_loss
+
+
+################################################################################
+# Inception-V3
+################################################################################
+## Creation ##
+def get_inception_v3(device='cuda', pretrained=True):
+    # create and download the model
+    inception_model = inception_v3(pretrained=True)
+    inception_model.load_state_dict(torch.load("inception_v3_google-1a9a5a14.pth"))
+    # put it on the device and set to EVAL mode
+    inception_model.to(device)
+    inception_model = inception_model.eval()
+    # replace last layer with identity to avoid classification
+    inception_model.fc = torch.nn.Identity()
+
+    # return
+    return inception_model
+
+## Extraction ##
+def inception_extraction(model, samples, device='cuda'):
+    with torch.no_grad():
+        # return evaluated samples
+        return model(samples.to(device)).detach().to('cpu')
+
+
+## Loss ##
+def inception_loss(model, loss, X, Y):
+    # extract features
+    X_features = inception_extraction(model, X)
+    Y_features = inception_extraction(model, Y)
+
+    # calculate loss on features
+    return loss(X_features, Y_features)
+
+

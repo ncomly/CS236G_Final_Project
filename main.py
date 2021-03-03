@@ -7,6 +7,7 @@ from data import *
 # runtime params
 adv_criterion = nn.MSELoss() 
 recon_criterion = nn.L1Loss() 
+inception_criterion = partial()
 
 dim_A = 3
 dim_B = 3
