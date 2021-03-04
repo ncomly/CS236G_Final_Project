@@ -362,7 +362,7 @@ def get_disc_loss(real_X, fake_X, disc_X, adv_criterion):
 def get_inception_v3(device='cuda', pretrained=True):
     # create and download the model
     inception_model = inception_v3(pretrained=True)
-    inception_model.load_state_dict(torch.load("inception_v3_google-1a9a5a14.pth"))
+    #inception_model.load_state_dict(torch.load("inception_v3_google-1a9a5a14.pth"))
     # put it on the device and set to EVAL mode
     inception_model.to(device)
     inception_model = inception_model.eval()

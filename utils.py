@@ -27,6 +27,8 @@ from datetime import datetime
 from skimage import color
 from PIL import Image
 
+from functools import partial
+
 
 from easydict import EasyDict as edict
 from pprint import pprint
