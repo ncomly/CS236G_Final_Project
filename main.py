@@ -18,6 +18,17 @@ def main(args):
         while True:
             for real_A, real_B in dataloader_val:
                 yield real_A, real_B
+    # helper for saving the model
+    def save_model():
+        torch.save({
+            'gen_AB': gen_AB.state_dict(),
+            'gen_BA': gen_BA.state_dict(),
+            'gen_opt': gen_opt.state_dict(),
+            'disc_A': disc_A.state_dict(),
+            'disc_A_opt': disc_A_opt.state_dict(),
+            'disc_B': disc_B.state_dict(),
+            'disc_B_opt': disc_B_opt.state_dict()
+        }, f"{args.save_path}{epoch}.pth")
 
 
 
@@ -197,22 +208,16 @@ def main(args):
                 if cur_step % args.display_step == 0:
                     train_writer.add_image('Real AB', convert_tensor_images(torch.cat([real_A, real_B], dim=-1), size=(dim_A, target_shape, target_shape)), cur_step)
                     train_writer.add_image('Fake BA', convert_tensor_images(torch.cat([fake_B, fake_A], dim=-1), size=(dim_A, target_shape, target_shape)), cur_step)
-
-                ## Model Saving ##
-                if args.save and cur_step % args.save_step == 0 and cur_step > 0:
-                    torch.save({
-                        'gen_AB': gen_AB.state_dict(),
-                        'gen_BA': gen_BA.state_dict(),
-                        'gen_opt': gen_opt.state_dict(),
-                        'disc_A': disc_A.state_dict(),
-                        'disc_A_opt': disc_A_opt.state_dict(),
-                        'disc_B': disc_B.state_dict(),
-                        'disc_B_opt': disc_B_opt.state_dict()
-                    }, f"{args.save_path}{cur_step}.pth")
                 cur_step += 1
 
 
             train_writer.flush()
+
+            ## Model Saving ##
+            if args.save and epoch % args.save_save == 0:
+                save_model()
+        if args.save:        
+            save_model()
 
 
 if __name__ == '__main__':
