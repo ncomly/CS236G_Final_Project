@@ -61,7 +61,7 @@ def main(args):
     idn_criterion = nn.L1Loss() 
     # cycle
     inception_model = get_inception_v3()
-    cyc_criterion = partial(inception_loss(inception_model, nn.L1Loss()))
+    cyc_criterion = partial(inception_loss, inception_model, nn.L1Loss())
 
 
 

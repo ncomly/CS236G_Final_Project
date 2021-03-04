@@ -7,7 +7,7 @@
     "epochs": 50,
     "device": "cuda",
     "display_step": 500,
-    "save_step": 5000,
+    "save_epochs": 3,
     "val_step" : 250,
     "lambda_identity" : 0.1,
     "lambda_cycle" : 1,
