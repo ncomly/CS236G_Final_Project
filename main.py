@@ -73,6 +73,7 @@ def main(args):
     # cycle
     inception_model = get_inception_v3()
     cyc_criterion = partial(inception_loss, inception_model, nn.L1Loss())
+    cyc_criterion = nn.L1Loss()
 
 
 
@@ -214,7 +215,7 @@ def main(args):
             train_writer.flush()
 
             ## Model Saving ##
-            if args.save and epoch % args.save_save == 0:
+            if args.save and epoch % args.save_epochs == 0:
                 save_model()
         if args.save:        
             save_model()
