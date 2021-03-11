@@ -336,7 +336,8 @@ def get_gen_loss(real_A, real_B, landmarks_B, gen_AB, gen_BA, disc_A, disc_B, di
     cyc_loss_AB, cyc_AB = get_cycle_consistency_loss(real_B, fake_A, gen_AB, cycle_criterion)
 
     # Reconstruction Adversarial Loss -- get_reconstruction_adversarial_loss(real_X, fake_Y, disc_L, gen_YX, cycle_criterion)
-    rec_loss_B, rec_B = get_reconstruction_adversarial_loss(real_B, fake_A, disc_L, gen_AB, adv_criterion)
+    rec_loss_B, rec_B = get_reconstruction_adversarial_loss(real_B, fake_A, landmarks_B, 
+                                                            disc_L, gen_AB, adv_criterion)
 
     # Total loss
     gen_loss = adv_loss_AB + adv_loss_BA \
@@ -346,7 +347,9 @@ def get_gen_loss(real_A, real_B, landmarks_B, gen_AB, gen_BA, disc_A, disc_B, di
     return gen_loss, fake_A, fake_B
 
 ## Individual Losses ##
-def get_gen_losses(real_A, real_B, gen_AB, gen_BA, disc_A, disc_B, adv_criterion, identity_criterion, cycle_criterion):
+def get_gen_losses(real_A, real_B, landmarks_B, 
+                    gen_AB, gen_BA, disc_A, disc_B, 
+                    adv_criterion, identity_criterion, cycle_criterion):
     # Adversarial Loss
     adv_loss_AB, fake_B = get_gen_adversarial_loss(real_A, disc_B, gen_AB, adv_criterion)
     adv_loss_BA, fake_A = get_gen_adversarial_loss(real_B, disc_A, gen_BA, adv_criterion)
@@ -363,7 +366,8 @@ def get_gen_losses(real_A, real_B, gen_AB, gen_BA, disc_A, disc_B, adv_criterion
     cyc_loss = cyc_loss_BA + cyc_loss_AB
 
     # Reconstruction Loss    
-    rec_loss_B, _ = get_reconstruction_adversarial_loss(real_B, fake_A, disc_L, gen_AB, adv_criterion)
+    rec_loss_B, _ = get_reconstruction_adversarial_loss(real_B, fake_A, landmarks_B,
+                                                        disc_L, gen_AB, adv_criterion)
 
 
     return adv_loss, idn_loss, cyc_loss

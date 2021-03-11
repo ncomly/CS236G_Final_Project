@@ -212,14 +212,14 @@ def main(args):
 
                     # Specific Losses
                     # train
-                    adv_train, idn_train, cyc_train, rec_train = get_gen_losses( real_A, real_B, 
+                    adv_train, idn_train, cyc_train, rec_train = get_gen_losses( real_A, real_B, landmarks_B
                                                                                 gen_AB, gen_BA, 
                                                                                 disc_A, disc_B, disc_L,
                                                                                 adv_criterion, 
                                                                                 idn_criterion, 
                                                                                 cyc_criterion)
                     # val
-                    adv_val, idn_val, cyc_val, rec_val = get_gen_losses(val_A, val_B, 
+                    adv_val, idn_val, cyc_val, rec_val = get_gen_losses(val_A, val_B, val_landmarks_B
                                                                         gen_AB, gen_BA, 
                                                                         disc_A, disc_B, disc_L, 
                                                                         adv_criterion, 
