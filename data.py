@@ -22,23 +22,19 @@ class ImageDataset(Dataset):
     def __getitem__(self, index):
         item_A = self.transform(Image.open(self.files_A[index % len(self.files_A)]))
         item_B = self.transform(Image.open(self.files_B[self.randperm[index]]))
+        item_L = self.transform(Image.open(self.files_L[self.randperm[index]])) 
+        
         if item_A.shape[0] != 3: 
             item_A = item_A.repeat(3, 1, 1)
         if item_B.shape[0] != 3: 
             item_B = item_B.repeat(3, 1, 1)
-
-        if self.files_L:
-            item_L = self.transform(Image.open(self.files_L[self.randperm[index]]))
-            if item_L.shape[0] != 3: 
-                item_L = item_B.repeat(3, 1, 1)
-                
-            if index == len(self) - 1:
-                self.new_perm()
-            return (item_A - 0.5) * 2, (item_B - 0.5) * 2, (item_L - 0.5) * 2
+        if item_L.shape[0] != 3: 
+            item_L = item_B.repeat(3, 1, 1)
                 
         if index == len(self) - 1:
             self.new_perm()
-        return (item_A - 0.5) * 2, (item_B - 0.5) * 2
+        return (item_A - 0.5) * 2, (item_B - 0.5) * 2, (item_L - 0.5) * 2
+                
 
 
 
