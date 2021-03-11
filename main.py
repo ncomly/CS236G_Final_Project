@@ -7,6 +7,7 @@ from data import *
 # runtime params
 dim_A = 3
 dim_B = 3
+dim_L = 3
 load_shape = 100
 target_shape = 100
     
@@ -106,6 +107,8 @@ def main(args):
         disc_A_opt.load_state_dict(pre_dict['disc_A_opt'])
         disc_B.load_state_dict(pre_dict['disc_B'])
         disc_B_opt.load_state_dict(pre_dict['disc_B_opt'])
+        disc_L.load_state_dict(pre_dict['disc_L'])
+        disc_L_opt.load_state_dict(pre_dict['disc_L_opt'])
     else:
         if args.save:
             args.save_path += 'cycleGAN_'
@@ -114,6 +117,7 @@ def main(args):
         gen_BA = gen_BA.apply(weights_init)
         disc_A = disc_A.apply(weights_init)
         disc_B = disc_B.apply(weights_init)
+        disc_L = disc_L.apply(weights_init)
 
     # Train
 
