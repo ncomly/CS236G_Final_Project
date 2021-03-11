@@ -137,7 +137,7 @@ def main(args):
         for epoch in range(args.epochs):
             print(f'Epoch {epoch}/{args.epochs}')
             # Dataloader returns the batches
-            for real_A, real_B, B_landmarks in tqdm(dataloader_train):
+            for real_A, real_B, landmarks_B in tqdm(dataloader_train):
                 real_A = nn.functional.interpolate(real_A, size=target_shape)
                 real_B = nn.functional.interpolate(real_B, size=target_shape)
                 landmarks_B = nn.functional.interpolate(landmarks_B, size=target_shape)
