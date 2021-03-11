@@ -179,9 +179,6 @@ def main(args):
                 disc_L_loss.backward(retain_graph=True) # Update gradients
                 disc_L_opt.step() # Update optimizer
 
-                # BREAK
-                break
-
 
                 # Keep track of the average discriminator loss
                 mean_discriminator_loss += disc_A_loss.item() / args.val_step
