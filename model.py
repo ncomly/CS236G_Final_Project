@@ -265,13 +265,38 @@ def get_cycle_consistency_loss(real_X, fake_Y, gen_YX, cycle_criterion):
     cycle_loss = cycle_criterion(real_X, cycle_X)
     return cycle_loss, cycle_X
 
+
+## Reconstruction Loss ##
+def get_reconstruction_adversarial_loss(real_X, fake_Y, disc_X, gen_YX, adv_criterion):
+    '''
+    Return the adversarial loss of the reconstructed inputs
+    (and the generated images for testing purposes).
+    Parameters:
+        real_X: the real images from pile X
+        fake_Y: the fake images generated in pile Y
+        disc_X: the discriminator for class X; takes images and returns real/fake class Y
+            prediction matrices
+        gen_YX: the generator for class Y to X; takes images and returns the images 
+            transformed to class X
+        adv_criterion: the adversarial loss function; takes the discriminator 
+                  predictions and the target labels and returns a adversarial 
+                  loss (which you aim to minimize)
+    '''
+    # create fake
+    rec_X = gen_YX(fake_Y)
+    disc_rec = disc_X(rec_X)
+    reconstruction_loss = adv_criterion(disc_rec, torch.ones_like(disc_rec))
+    return reconstruction_loss, rec_X
+
+
 ## Total Loss ##
-def get_gen_loss(real_A, real_B, gen_AB, gen_BA, disc_A, disc_B, adv_criterion, identity_criterion, cycle_criterion, lambda_identity=0.1, lambda_cycle=10):
+def get_gen_loss(real_A, real_B, landmarks_B, gen_AB, gen_BA, disc_A, disc_B, disc_L, adv_criterion, identity_criterion, cycle_criterion, lambda_identity=0.1, lambda_cycle=10, lambda_rec=10):
     '''
     Return the loss of the generator given inputs.
     Parameters:
         real_A: the real images from pile A
         real_B: the real images from pile B
+        landmarks_B: the landmarks for images from pile B
         gen_AB: the generator for class A to B; takes images and returns the images 
             transformed to class B
         gen_BA: the generator for class B to A; takes images and returns the images 
@@ -279,6 +304,9 @@ def get_gen_loss(real_A, real_B, gen_AB, gen_BA, disc_A, disc_B, adv_criterion, 
         disc_A: the discriminator for class A; takes images and returns real/fake class A
             prediction matrices
         disc_B: the discriminator for class B; takes images and returns real/fake class B
+            prediction matrices
+        disc_L: the reconstruction discriminator for class B, conditioned on landmarks; 
+            takes images concatenated by channel with landmarks and returns real/fake class B
             prediction matrices
         adv_criterion: the adversarial loss function; takes the discriminator 
             predictions and the true labels and returns a adversarial 
@@ -292,6 +320,7 @@ def get_gen_loss(real_A, real_B, gen_AB, gen_BA, disc_A, disc_B, adv_criterion, 
             Note that in practice, cycle_criterion == identity_criterion == L1 loss
         lambda_identity: the weight of the identity loss
         lambda_cycle: the weight of the cycle-consistency loss
+        lambda_rec: the weight of the reconstruction-adversarial loss
     '''
     # Adversarial Loss -- get_gen_adversarial_loss(real_X, disc_Y, gen_XY, adv_criterion)
     adv_loss_AB, fake_B = get_gen_adversarial_loss(real_A, disc_B, gen_AB, adv_criterion)
@@ -305,10 +334,14 @@ def get_gen_loss(real_A, real_B, gen_AB, gen_BA, disc_A, disc_B, adv_criterion, 
     cyc_loss_BA, cyc_BA = get_cycle_consistency_loss(real_A, fake_B, gen_BA, cycle_criterion)
     cyc_loss_AB, cyc_AB = get_cycle_consistency_loss(real_B, fake_A, gen_AB, cycle_criterion)
 
+    # Reconstruction Adversarial Loss -- get_reconstruction_adversarial_loss(real_X, fake_Y, disc_L, gen_YX, cycle_criterion)
+    rec_loss_B, rec_B = get_reconstruction_adversarial_loss(real_B, fake_A, disc_L, gen_AB, adv_criterion)
+
     # Total loss
     gen_loss = adv_loss_AB + adv_loss_BA \
                 + lambda_identity*(idn_loss_AB + idn_loss_BA) \
-                + lambda_cycle*(cyc_loss_AB + cyc_loss_BA)
+                + lambda_cycle*(cyc_loss_AB + cyc_loss_BA) \
+                + lambda_rec*(rec_loss_B)
     return gen_loss, fake_A, fake_B
 
 ## Individual Losses ##
@@ -327,6 +360,10 @@ def get_gen_losses(real_A, real_B, gen_AB, gen_BA, disc_A, disc_B, adv_criterion
     cyc_loss_BA, _ = get_cycle_consistency_loss(real_A, fake_B, gen_BA, cycle_criterion)
     cyc_loss_AB, _ = get_cycle_consistency_loss(real_B, fake_A, gen_AB, cycle_criterion)
     cyc_loss = cyc_loss_BA + cyc_loss_AB
+
+    # Reconstruction Loss    
+    rec_loss_B, _ = get_reconstruction_adversarial_loss(real_B, fake_A, disc_L, gen_AB, adv_criterion)
+
 
     return adv_loss, idn_loss, cyc_loss
 
