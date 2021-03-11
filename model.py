@@ -374,9 +374,8 @@ def get_inception_v3(device='cuda', pretrained=True):
 
 ## Extraction ##
 def inception_extraction(model, samples, device='cuda'):
-    with torch.no_grad():
-        # return evaluated samples
-        return model(samples.to(device)).detach().to('cpu')
+    # return evaluated samples
+    return model(samples.to(device)).detach().to('cpu')
 
 
 ## Loss ##
