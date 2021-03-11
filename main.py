@@ -49,11 +49,13 @@ def main(args):
                                     transform=transform, 
                                     a_subroot=args.A_subfolder, 
                                     b_subroot=args.B_subfolder,
+                                    l_subroot=args.L_subfolder,
                                     mode='train')
         dataset_val   = ImageDataset(args.data_folder, 
                                     transform=transform, 
                                     a_subroot=args.A_subfolder, 
                                     b_subroot=args.B_subfolder,
+                                    l_subroot=args.L_subfolder,
                                     mode='val')
         val_gen = get_val_examples
 
@@ -62,6 +64,7 @@ def main(args):
                                     transform=transform, 
                                     a_subroot=args.A_subfolder, 
                                     b_subroot=args.B_subfolder,
+                                    l_subroot=args.L_subfolder,
                                     mode='test')
 
 
