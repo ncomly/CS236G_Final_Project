@@ -17,8 +17,8 @@ def main(args):
     # helper function for getting validation examples
     def get_val_examples():
         while True:
-            for real_A, real_B in dataloader_val:
-                yield real_A, real_B
+            for real_A, real_B, landmarks_B in dataloader_val:
+                yield real_A, real_B, landmarks_B
     # helper for saving the model
     def save_model():
         torch.save({
@@ -162,12 +162,20 @@ def main(args):
                 disc_B_loss.backward(retain_graph=True) # Update gradients
                 disc_B_opt.step() # Update optimizer
 
+                ## Update Reconstruction Discriminator L ##
+                with torch.no_grad():
+                    rec_B = gen_AB(gen_BA(real_B))
+                disc_L_loss = get_disc_loss_L(real_B, rec_B, landmarks_B, disc_L, adv_criterion)
+                disc_L_loss.backward(retain_graph=True) # Update gradients
+                disc_L_opt.step() # Update optimizer
+
                 ### Update generator ###
                 gen_opt.zero_grad()
                 gen_loss, fake_A, fake_B = get_gen_loss(
-                    real_A, real_B, gen_AB, gen_BA, disc_A, disc_B, 
+                    real_A, real_B, landmarks_B, 
+                    gen_AB, gen_BA, disc_A, disc_B, disc_L,
                     adv_criterion, idn_criterion, cyc_criterion, 
-                    args.lambda_identity, args.lambda_cycle
+                    args.lambda_identity, args.lambda_cycle, args.lambda_rec
                 )
                 gen_loss.backward() # Update gradients
                 gen_opt.step() # Update optimizer
@@ -194,36 +202,40 @@ def main(args):
                     mean_generator_loss = 0
                     mean_discriminator_loss = 0
 
-                    val_A, val_B = next(val_gen())
+                    val_A, val_B, landmarks_B = next(val_gen())
                     val_A = nn.functional.interpolate(val_A, size=target_shape)
                     val_B = nn.functional.interpolate(val_B, size=target_shape)
+                    val_landmarks_B = nn.functional.interpolate(val_landmarks_B, size=target_shape)
                     val_A = val_A.to(args.device)
                     val_B = val_B.to(args.device)
+                    val_landmarks_B = val_landmarks_B.to(args.device)
 
                     # Specific Losses
                     # train
-                    adv_train, idn_train, cyc_train = get_gen_losses( real_A, real_B, 
-                                                                    gen_AB, gen_BA, 
-                                                                    disc_A, disc_B, 
-                                                                    adv_criterion, 
-                                                                    idn_criterion, 
-                                                                    cyc_criterion)
+                    adv_train, idn_train, cyc_train, rec_train = get_gen_losses( real_A, real_B, 
+                                                                                gen_AB, gen_BA, 
+                                                                                disc_A, disc_B, disc_L,
+                                                                                adv_criterion, 
+                                                                                idn_criterion, 
+                                                                                cyc_criterion)
                     # val
-                    adv_val, idn_val, cyc_val = get_gen_losses( val_A, val_B, 
-                                                                gen_AB, gen_BA, 
-                                                                disc_A, disc_B, 
-                                                                adv_criterion, 
-                                                                idn_criterion, 
-                                                                cyc_criterion)
+                    adv_val, idn_val, cyc_val, rec_val = get_gen_losses(val_A, val_B, 
+                                                                        gen_AB, gen_BA, 
+                                                                        disc_A, disc_B, disc_L, 
+                                                                        adv_criterion, 
+                                                                        idn_criterion, 
+                                                                        cyc_criterion)
 
                     #Write
                     train_writer.add_scalar("Adversarial Loss", adv_train, cur_step)
                     train_writer.add_scalar("Identity Loss", idn_train, cur_step)
                     train_writer.add_scalar("Cycle-Consistency Loss", cyc_train, cur_step)
+                    train_writer.add_scalar("Rec-Adversarial Loss", rec_train, cur_step)
 
                     val_writer.add_scalar("Adversarial Loss", adv_val, cur_step)
                     val_writer.add_scalar("Identity Loss", idn_val, cur_step)
                     val_writer.add_scalar("Cycle-Consistency Loss", cyc_val, cur_step)
+                    val_writer.add_scalar("Rec-Adversarial Loss", rec_val, cur_step)
 
 
                 ## Save Images ##

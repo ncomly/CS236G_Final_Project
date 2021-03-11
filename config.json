@@ -12,5 +12,6 @@
     "val_step" : 250,
     "lambda_identity" : 0.1,
     "lambda_cycle" : 5,
+    "lambda_rec" : 1,
     "description":"cycleGAN Baseline"
 }
