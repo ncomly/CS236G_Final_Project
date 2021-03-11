@@ -348,7 +348,7 @@ def get_gen_loss(real_A, real_B, landmarks_B, gen_AB, gen_BA, disc_A, disc_B, di
 
 ## Individual Losses ##
 def get_gen_losses(real_A, real_B, landmarks_B, 
-                    gen_AB, gen_BA, disc_A, disc_B, 
+                    gen_AB, gen_BA, disc_A, disc_B, disc_L,
                     adv_criterion, identity_criterion, cycle_criterion):
     # Adversarial Loss
     adv_loss_AB, fake_B = get_gen_adversarial_loss(real_A, disc_B, gen_AB, adv_criterion)
