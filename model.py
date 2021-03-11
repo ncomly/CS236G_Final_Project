@@ -366,11 +366,11 @@ def get_gen_losses(real_A, real_B, landmarks_B,
     cyc_loss = cyc_loss_BA + cyc_loss_AB
 
     # Reconstruction Loss    
-    rec_loss_B, _ = get_reconstruction_adversarial_loss(real_B, fake_A, landmarks_B,
+    rec_loss, _ = get_reconstruction_adversarial_loss(real_B, fake_A, landmarks_B,
                                                         disc_L, gen_AB, adv_criterion)
 
 
-    return adv_loss, idn_loss, cyc_loss
+    return adv_loss, idn_loss, cyc_loss, rec_loss
 
 
 ##### Discriminator Loss #####
