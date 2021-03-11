@@ -8,7 +8,6 @@ class ImageDataset(Dataset):
         self.files_B = sorted(glob.glob(os.path.join(root, b_subroot, mode) + '/*.*'))
         if l_subroot:
             self.files_L = sorted(glob.glob(os.path.join(root, l_subroot, mode) + '/*.*'))
-            print('Using Landmarks!')
         else:
             self.file_L = None
         if len(self.files_A) > len(self.files_B):
@@ -20,7 +19,6 @@ class ImageDataset(Dataset):
         self.randperm = torch.randperm(len(self.files_B))[:len(self.files_A)]
 
     def __getitem__(self, index):
-        print(len(self.files_A), len(self.files_B), len(self.files_L))
         item_A = self.transform(Image.open(self.files_A[index % len(self.files_A)]))
         item_B = self.transform(Image.open(self.files_B[self.randperm[index]]))
         item_L = self.transform(Image.open(self.files_L[self.randperm[index]])) 

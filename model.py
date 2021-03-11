@@ -369,8 +369,6 @@ def get_disc_loss_L(real_X, rec_X, landmarks_X, disc_X, adv_criterion):
             loss (which you aim to minimize)
     '''
     # concatenate real and reconstructed with landmarks. along the channel dimension
-    print(real_X.shape)
-    print(landmarks_X.shape)
     real_X = torch.cat((real_X, landmarks_X), 1)
     rec_X  = torch.cat((rec_X, landmarks_X), 1)
 
