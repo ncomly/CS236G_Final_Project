@@ -20,7 +20,7 @@ class ImageDataset(Dataset):
         self.randperm = torch.randperm(len(self.files_B))[:len(self.files_A)]
 
     def __getitem__(self, index):
-        print(self.files_A.shape, self.files_B.shape, self.files_L.shape)
+        print(len(self.files_A), len(self.files_B), len(self.files_L))
         item_A = self.transform(Image.open(self.files_A[index % len(self.files_A)]))
         item_B = self.transform(Image.open(self.files_B[self.randperm[index]]))
         item_L = self.transform(Image.open(self.files_L[self.randperm[index]])) 
