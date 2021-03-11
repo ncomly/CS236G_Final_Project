@@ -89,6 +89,10 @@ def main(args):
     disc_B = Discriminator(dim_B).to(args.device)
     disc_B_opt = torch.optim.Adam(disc_B.parameters(), lr=args.lr, betas=(0.5, 0.999))
 
+    # reconstruction discriminator
+    disc_L = Discriminator(dim_L).to(args.device)
+    disc_L_opt = torch.optim.Adam(disc_L.parameters(), lr=args.lr, betas=(0.5, 0.999))
+
     ## Initialize weights
     if args.checkpoint:
         print(f'Loading pretrained model: {args.checkpoint}')
@@ -115,7 +119,7 @@ def main(args):
 
     if args.train:
         # Tensorboard summary writer
-        logdir = 'runs/' + datetime.now().strftime("%d_%m_%Y__%H_%M_%S/")
+        logdir = 'runs/' + datetime.now().strftime("%d_%m_%Y__%H_%M_%S_") + f'lr{args.lr}_wcl{args.lambda_cycle}/'
         train_writer = SummaryWriter(logdir + 'train')
         val_writer = SummaryWriter(logdir + 'val')
 
