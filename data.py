@@ -8,6 +8,7 @@ class ImageDataset(Dataset):
         self.files_B = sorted(glob.glob(os.path.join(root, b_subroot, mode) + '/*.*'))
         if l_subroot:
             self.files_L = sorted(glob.glob(os.path.join(root, l_subroot, mode) + '/*.*'))
+            print('Using Landmarks!')
         else:
             self.file_L = None
         if len(self.files_A) > len(self.files_B):
