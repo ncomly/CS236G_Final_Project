@@ -355,6 +355,36 @@ def get_disc_loss(real_X, fake_X, disc_X, adv_criterion):
     return disc_loss
 
 
+##### Discriminator Loss #####
+def get_disc_loss_L(real_X, rec_X, landmarks_X, disc_X, adv_criterion):
+    '''
+    Return the loss of the discriminator given inputs.
+    Parameters:
+        real_X: the real images from pile X
+        rec_X : the reconstructed images of class X
+        disc_X: the discriminator for class X; takes images and returns real/fake class X
+            prediction matrices
+        adv_criterion: the adversarial loss function; takes the discriminator 
+            predictions and the target labels and returns a adversarial 
+            loss (which you aim to minimize)
+    '''
+    # concatenate real and reconstructed with landmarks. along the channel dimension
+    print(real_X.shape)
+    print(landmarks_X.shape)
+    real_X = torch.cat((real_X, landmarks_X), 1)
+    rec_X  = torch.cat((rec_X, landmarks_X), 1)
+
+    # get reconstruction loss
+    disc_rec = disc_X(rec_X)
+    disc_loss_rec = adv_criterion(disc_rec, torch.zeros_like(disc_rec))
+    # get real loss
+    disc_real = disc_X(real_X)
+    disc_loss_real = adv_criterion(disc_real, torch.ones_like(disc_real))
+    # average
+    disc_loss = (disc_loss_rec + disc_loss_real) / 2
+    return disc_loss
+
+
 ################################################################################
 # Inception-V3
 ################################################################################

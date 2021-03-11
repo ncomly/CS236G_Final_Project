@@ -7,7 +7,7 @@ from data import *
 # runtime params
 dim_A = 3
 dim_B = 3
-dim_L = 3
+dim_L = 6
 load_shape = 100
 target_shape = 100
     
@@ -137,12 +137,14 @@ def main(args):
         for epoch in range(args.epochs):
             print(f'Epoch {epoch}/{args.epochs}')
             # Dataloader returns the batches
-            for real_A, real_B in tqdm(dataloader_train):
+            for real_A, real_B, B_landmarks in tqdm(dataloader_train):
                 real_A = nn.functional.interpolate(real_A, size=target_shape)
                 real_B = nn.functional.interpolate(real_B, size=target_shape)
+                landmarks_B = nn.functional.interpolate(landmarks_B, size=target_shape)
                 cur_batch_size = len(real_A)
                 real_A = real_A.to(args.device)
                 real_B = real_B.to(args.device)
+                landmarks_B = landmarks_B.to(args.device)
 
                 ### Update discriminator A ###
                 disc_A_opt.zero_grad() # Zero out the gradient before backpropagation
@@ -169,6 +171,17 @@ def main(args):
                 )
                 gen_loss.backward() # Update gradients
                 gen_opt.step() # Update optimizer
+
+                ## Update Reconstruction Discriminator L ##
+                with torch.no_grad():
+                    rec_B = gen_AB(gen_BA(real_B))
+                disc_L_loss = get_disc_loss_L(real_B, rec_B, landmarks_B, disc_L, adv_criterion)
+                disc_L_loss.backward(retain_graph=True) # Update gradients
+                disc_L_opt.step() # Update optimizer
+
+                # BREAK
+                break
+
 
                 # Keep track of the average discriminator loss
                 mean_discriminator_loss += disc_A_loss.item() / args.val_step
