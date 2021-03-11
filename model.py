@@ -267,13 +267,14 @@ def get_cycle_consistency_loss(real_X, fake_Y, gen_YX, cycle_criterion):
 
 
 ## Reconstruction Loss ##
-def get_reconstruction_adversarial_loss(real_X, fake_Y, disc_X, gen_YX, adv_criterion):
+def get_reconstruction_adversarial_loss(real_X, fake_Y, landmarks_X, disc_L, gen_YX, adv_criterion):
     '''
     Return the adversarial loss of the reconstructed inputs
     (and the generated images for testing purposes).
     Parameters:
         real_X: the real images from pile X
         fake_Y: the fake images generated in pile Y
+        landmarks_X: the landmarks for images from pile X
         disc_X: the discriminator for class X; takes images and returns real/fake class Y
             prediction matrices
         gen_YX: the generator for class Y to X; takes images and returns the images 
@@ -284,7 +285,7 @@ def get_reconstruction_adversarial_loss(real_X, fake_Y, disc_X, gen_YX, adv_crit
     '''
     # create fake
     rec_X = gen_YX(fake_Y)
-    disc_rec = disc_X(rec_X)
+    disc_rec = disc_L(torch.cat((rec_X, landmarks_X), 1))
     reconstruction_loss = adv_criterion(disc_rec, torch.ones_like(disc_rec))
     return reconstruction_loss, rec_X
 
