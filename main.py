@@ -131,7 +131,7 @@ def main(args):
     if args.train:
         # Tensorboard summary writer
         logdir = 'runs/' + datetime.now().strftime("%d_%m_%Y__%H_%M_%S_") \
-                            + f'lr{args.lr}_wcl{args.lambda_cycle}_wrl{args.lamda_rec}/'
+                            + f'lr{args.lr}_wcl{args.lambda_cycle}_wrl{args.lambda_rec}/'
         train_writer = SummaryWriter(logdir + 'train')
         val_writer = SummaryWriter(logdir + 'val')
 
