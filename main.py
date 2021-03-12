@@ -268,5 +268,6 @@ if __name__ == '__main__':
 
     # get arguments
     args = parse_args()
+    print(args)
     
     main(args)
