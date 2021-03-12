@@ -284,10 +284,11 @@ def get_reconstruction_adversarial_loss(real_X, fake_Y, landmarks_X, disc_L, gen
                   loss (which you aim to minimize)
     '''
     # create fake
-    rec_X = gen_YX(fake_Y)
-    disc_rec = disc_L(torch.cat((rec_X, landmarks_X), 1))
-    reconstruction_loss = adv_criterion(disc_rec, torch.ones_like(disc_rec))
-    return reconstruction_loss, rec_X
+    if disc_L != None:
+        rec_X = gen_YX(fake_Y)
+        disc_rec = disc_L(torch.cat((rec_X, landmarks_X), 1))
+        reconstruction_loss = adv_criterion(disc_rec, torch.ones_like(disc_rec))
+        return reconstruction_loss, rec_X
 
 
 ## Total Loss ##
@@ -336,8 +337,9 @@ def get_gen_loss(real_A, real_B, landmarks_B, gen_AB, gen_BA, disc_A, disc_B, di
     cyc_loss_AB, cyc_AB = get_cycle_consistency_loss(real_B, fake_A, gen_AB, cycle_criterion)
 
     # Reconstruction Adversarial Loss -- get_reconstruction_adversarial_loss(real_X, fake_Y, disc_L, gen_YX, cycle_criterion)
-    rec_loss_B, rec_B = get_reconstruction_adversarial_loss(real_B, fake_A, landmarks_B, 
-                                                            disc_L, gen_AB, adv_criterion)
+    if disc_L != None:
+        rec_loss_B, rec_B = get_reconstruction_adversarial_loss(real_B, fake_A, landmarks_B, 
+                                                                disc_L, gen_AB, adv_criterion)
 
     # Total loss
     gen_loss = adv_loss_AB + adv_loss_BA \
@@ -365,9 +367,10 @@ def get_gen_losses(real_A, real_B, landmarks_B,
     cyc_loss_AB, _ = get_cycle_consistency_loss(real_B, fake_A, gen_AB, cycle_criterion)
     cyc_loss = cyc_loss_BA + cyc_loss_AB
 
-    # Reconstruction Loss    
-    rec_loss, _ = get_reconstruction_adversarial_loss(real_B, fake_A, landmarks_B,
-                                                        disc_L, gen_AB, adv_criterion)
+    # Reconstruction Loss 
+    if disc_L != None:   
+        rec_loss, _ = get_reconstruction_adversarial_loss(real_B, fake_A, landmarks_B,
+                                                            disc_L, gen_AB, adv_criterion)
 
 
     return adv_loss, idn_loss, cyc_loss, rec_loss
@@ -398,7 +401,7 @@ def get_disc_loss(real_X, fake_X, disc_X, adv_criterion):
 
 
 ##### Discriminator Loss #####
-def get_disc_loss_L(real_X, rec_X, landmarks_X, disc_X, adv_criterion):
+def get_disc_loss_L(real_X, rec_X, landmarks_X, disc_LX, adv_criterion):
     '''
     Return the loss of the discriminator given inputs.
     Parameters:
@@ -415,10 +418,10 @@ def get_disc_loss_L(real_X, rec_X, landmarks_X, disc_X, adv_criterion):
     rec_X  = torch.cat((rec_X, landmarks_X), 1)
 
     # get reconstruction loss
-    disc_rec = disc_X(rec_X)
+    disc_rec = disc_LX(rec_X)
     disc_loss_rec = adv_criterion(disc_rec, torch.zeros_like(disc_rec))
     # get real loss
-    disc_real = disc_X(real_X)
+    disc_real = disc_LX(real_X)
     disc_loss_real = adv_criterion(disc_real, torch.ones_like(disc_real))
     # average
     disc_loss = (disc_loss_rec + disc_loss_real) / 2

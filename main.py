@@ -17,8 +17,8 @@ def main(args):
     # helper function for getting validation examples
     def get_val_examples():
         while True:
-            for real_A, real_B, landmarks_B in dataloader_val:
-                yield real_A, real_B, landmarks_B
+            for example in dataloader_val:
+                yield example
     # helper for saving the model
     def save_model():
         torch.save({
@@ -75,9 +75,11 @@ def main(args):
     # identity
     idn_criterion = nn.L1Loss() 
     # cycle
-    inception_model = get_inception_v3()
-    cyc_criterion = partial(inception_loss, inception_model, nn.L1Loss())
-    #cyc_criterion = nn.L1Loss()
+    if args.iv3:
+        inception_model = get_inception_v3()
+        cyc_criterion = partial(inception_loss, inception_model, nn.L1Loss())
+    else:
+        cyc_criterion = nn.L1Loss()
 
 
 
@@ -118,6 +120,11 @@ def main(args):
         disc_A = disc_A.apply(weights_init)
         disc_B = disc_B.apply(weights_init)
         disc_L = disc_L.apply(weights_init)
+
+    # Landmarks
+    if args.nolandmarks:
+        disc_L = None
+        disc_L_opt = None
 
     # Train
 
@@ -163,11 +170,12 @@ def main(args):
                 disc_B_opt.step() # Update optimizer
 
                 ## Update Reconstruction Discriminator L ##
-                with torch.no_grad():
-                    rec_B = gen_AB(gen_BA(real_B))
-                disc_L_loss = get_disc_loss_L(real_B, rec_B, landmarks_B, disc_L, adv_criterion)
-                disc_L_loss.backward(retain_graph=True) # Update gradients
-                disc_L_opt.step() # Update optimizer
+                if not args.nolandmarks:
+                    with torch.no_grad():
+                        rec_B = gen_AB(gen_BA(real_B))
+                    disc_L_loss = get_disc_loss_L(real_B, rec_B, landmarks_B, disc_L, adv_criterion)
+                    disc_L_loss.backward(retain_graph=True) # Update gradients
+                    disc_L_opt.step() # Update optimizer
 
                 ### Update generator ###
                 gen_opt.zero_grad()
@@ -181,11 +189,12 @@ def main(args):
                 gen_opt.step() # Update optimizer
 
                 ## Update Reconstruction Discriminator L ##
-                with torch.no_grad():
-                    rec_B = gen_AB(gen_BA(real_B))
-                disc_L_loss = get_disc_loss_L(real_B, rec_B, landmarks_B, disc_L, adv_criterion)
-                disc_L_loss.backward(retain_graph=True) # Update gradients
-                disc_L_opt.step() # Update optimizer
+                if not args.nolandmarks:
+                    with torch.no_grad():
+                        rec_B = gen_AB(gen_BA(real_B))
+                    disc_L_loss = get_disc_loss_L(real_B, rec_B, landmarks_B, disc_L, adv_criterion)
+                    disc_L_loss.backward(retain_graph=True) # Update gradients
+                    disc_L_opt.step() # Update optimizer
 
 
                 # Keep track of the average discriminator loss
