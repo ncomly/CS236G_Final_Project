@@ -122,7 +122,7 @@ def main(args):
         disc_L = disc_L.apply(weights_init)
 
     # Landmarks
-    if args.nolandmarks:
+    if not args.landmarks:
         disc_L = None
         disc_L_opt = None
 
@@ -171,7 +171,7 @@ def main(args):
                 disc_B_opt.step() # Update optimizer
 
                 ## Update Reconstruction Discriminator L ##
-                if not args.nolandmarks:
+                if args.landmarks:
                     with torch.no_grad():
                         rec_B = gen_AB(gen_BA(real_B))
                     disc_L_loss = get_disc_loss_L(real_B, rec_B, landmarks_B, disc_L, adv_criterion)
@@ -190,7 +190,7 @@ def main(args):
                 gen_opt.step() # Update optimizer
 
                 ## Update Reconstruction Discriminator L ##
-                if not args.nolandmarks:
+                if args.landmarks:
                     with torch.no_grad():
                         rec_B = gen_AB(gen_BA(real_B))
                     disc_L_loss = get_disc_loss_L(real_B, rec_B, landmarks_B, disc_L, adv_criterion)

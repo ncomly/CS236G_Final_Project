@@ -102,6 +102,7 @@ def parse_args():
     config_args.checkpoint = args.checkpoint
     config_args.save = not args.nosave
     config_args.iv3 = args.iv3
+    config_args.landmarks = not args.nolandmarks
     
 
     pprint(config_args)
