@@ -4,7 +4,7 @@ Stanford CS 236G Final Project
 ## Setup
 Follow these instructions to use this repo.
 #### Environment
-First, clone the repo, create a new environment and activate it.
+First, clone the repo. Then create a new environment and activate it.
 
 With Conda:
 ```
