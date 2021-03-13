@@ -46,7 +46,7 @@ There are multiple arguments for `main.py`, but the only required argument to tr
   $> python main.py --train
 ```
 
-In addtion, if using Inception v3 feature loss for the cycle loss is desired, the `--iv3` flag can be added. And if the added reconstruction loss is desired, add the flag `--landmarks`
+In addtion, if using Inception v3 feature loss for the cycle loss is desired, the `--iv3` flag can be added. And if the landmark reconstruction loss is desired, add the flag `--landmarks`
 
 ie. to train using Inception v3 feature loss AND add the landmark adversarial reconstruction loss, run:
 
