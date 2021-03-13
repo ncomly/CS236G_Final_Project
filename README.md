@@ -34,6 +34,7 @@ This can be done by running:
 ```
 
 _Note: If the location of CelebA_50K was changed, the `data_dir` variable will need to be updated as well_
+_Note: If using landmarks `data_dir` should be changed to the location of the Landmarks directory and this script should be rerun_
 
 ## Usage
 For the base implementation of CycleGAN, first follow the setup above to prepare the environment and download the dataset.
@@ -44,6 +45,15 @@ There are multiple arguments for `main.py`, but the only required argument to tr
 ```
   $> python main.py --train
 ```
+
+In addtion, if using Inception v3 feature loss for the cycle loss is desired, the `--iv3` flag can be added. And if the added reconstruction loss is desired, add the flag `--landmarks`
+
+ie. to train using Inception v3 feature loss AND add the landmark adversarial reconstruction loss, run:
+
+```
+  $> python main.py --train --iv3 --landmarks
+```
+
 
 As of now, test mode has not been implemented
 
