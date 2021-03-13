@@ -69,7 +69,7 @@ def parse_args():
     parser.add_argument('--save_path', default='./models/', type=str, help='Top level directory to store model checkpoints')
     parser.add_argument('--train', action='store_true', help='Will train if provided')
     parser.add_argument('--nosave', action='store_true', help='Will not save checkpionts if provided')
-    parser.add_argument('--nolandmarks', action='store_true', help='Will not use landmarks if provided')
+    parser.add_argument('--landmarks', action='store_true', help='Will use landmarks if provided')
     parser.add_argument('--iv3', action='store_true', help='Will use InceptionV3 for the cycle loss')
 
     # Parse the arguments
@@ -102,7 +102,7 @@ def parse_args():
     config_args.checkpoint = args.checkpoint
     config_args.save = not args.nosave
     config_args.iv3 = args.iv3
-    config_args.landmarks = not args.nolandmarks
+    config_args.landmarks = args.landmarks
     
 
     pprint(config_args)

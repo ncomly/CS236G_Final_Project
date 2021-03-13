@@ -344,8 +344,10 @@ def get_gen_loss(real_A, real_B, landmarks_B, gen_AB, gen_BA, disc_A, disc_B, di
     # Total loss
     gen_loss = adv_loss_AB + adv_loss_BA \
                 + lambda_identity*(idn_loss_AB + idn_loss_BA) \
-                + lambda_cycle*(cyc_loss_AB + cyc_loss_BA) \
-                + lambda_rec*(rec_loss_B)
+                + lambda_cycle*(cyc_loss_AB + cyc_loss_BA)
+
+    if disc_L != None:
+        gen_loss += lambda_rec*(rec_loss_B)
     return gen_loss, fake_A, fake_B
 
 ## Individual Losses ##
@@ -373,7 +375,9 @@ def get_gen_losses(real_A, real_B, landmarks_B,
                                                             disc_L, gen_AB, adv_criterion)
 
 
-    return adv_loss, idn_loss, cyc_loss, rec_loss
+        return adv_loss, idn_loss, cyc_loss, rec_loss
+    else:
+        return adv_loss, idn_loss, cyc_loss
 
 
 ##### Discriminator Loss #####

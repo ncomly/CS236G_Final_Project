@@ -11,7 +11,7 @@
     "save_epochs": 3,
     "val_step" : 250,
     "lambda_identity" : 0.1,
-    "lambda_cycle" : 5,
-    "lambda_rec" : 1,
+    "lambda_cycle" : 10,
+    "lambda_rec" : 0,
     "description":"cycleGAN Baseline"
 }

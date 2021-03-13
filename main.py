@@ -222,30 +222,38 @@ def main(args):
 
                     # Specific Losses
                     # train
-                    adv_train, idn_train, cyc_train, rec_train = get_gen_losses( real_A, real_B, landmarks_B,
-                                                                                gen_AB, gen_BA, 
-                                                                                disc_A, disc_B, disc_L,
-                                                                                adv_criterion, 
-                                                                                idn_criterion, 
-                                                                                cyc_criterion)
+                    train_losses = get_gen_losses( real_A, real_B, landmarks_B,
+                                                   gen_AB, gen_BA, 
+                                                   disc_A, disc_B, disc_L,
+                                                   adv_criterion, 
+                                                   idn_criterion, 
+                                                   cyc_criterion)
                     # val
-                    adv_val, idn_val, cyc_val, rec_val = get_gen_losses(val_A, val_B, val_landmarks_B,
-                                                                        gen_AB, gen_BA, 
-                                                                        disc_A, disc_B, disc_L, 
-                                                                        adv_criterion, 
-                                                                        idn_criterion, 
-                                                                        cyc_criterion)
+                    val_losses   = get_gen_losses(val_A, val_B, val_landmarks_B,
+                                                  gen_AB, gen_BA, 
+                                                  disc_A, disc_B, disc_L, 
+                                                  adv_criterion, 
+                                                  idn_criterion, 
+                                                  cyc_criterion)
+
+                    if args.landmarks:
+                        adv_train, idn_train, cyc_train, rec_train = train_losses
+                        adv_val  , idn_val  , cyc_val  , rec_val   = val_losses
+                    else:
+                        adv_train, idn_train, cyc_train = train_losses
+                        adv_val  , idn_val  , cyc_val   = val_losses
 
                     #Write
                     train_writer.add_scalar("Adversarial Loss", adv_train, cur_step)
                     train_writer.add_scalar("Identity Loss", idn_train, cur_step)
                     train_writer.add_scalar("Cycle-Consistency Loss", cyc_train, cur_step)
-                    train_writer.add_scalar("Rec-Adversarial Loss", rec_train, cur_step)
 
                     val_writer.add_scalar("Adversarial Loss", adv_val, cur_step)
                     val_writer.add_scalar("Identity Loss", idn_val, cur_step)
                     val_writer.add_scalar("Cycle-Consistency Loss", cyc_val, cur_step)
-                    val_writer.add_scalar("Rec-Adversarial Loss", rec_val, cur_step)
+                    if args.landmarks:
+                        train_writer.add_scalar("Rec-Adversarial Loss", rec_train, cur_step)
+                        val_writer.add_scalar("Rec-Adversarial Loss", rec_val, cur_step)
 
 
                 ## Save Images ##
