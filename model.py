@@ -137,9 +137,8 @@ class Generator(nn.Module):
         res_mult = 4
 
         # dynamic transformer sizing
-        self.res_blocks = []
-        for i in range(num_res):
-            self.res_blocks.append(ResidualBlock(hidden_channels * res_mult))
+        self.res_blocks = nn.ModuleList([ResidualBlock(hidden_channels * res_mult) 
+                                            for _ in range(num_res)])
 
         self.expand2 = ExpandingBlock(hidden_channels * 4)
         self.expand3 = ExpandingBlock(hidden_channels * 2)
