@@ -71,6 +71,7 @@ def parse_args():
     parser.add_argument('--nosave', action='store_true', help='Will not save checkpionts if provided')
     parser.add_argument('--landmarks', action='store_true', help='Will use landmarks if provided')
     parser.add_argument('--iv3', action='store_true', help='Will use InceptionV3 for the cycle loss')
+    parser.add_argument('--att', action='store_true', help='Will add attention mechanisim in the generator')
 
     # Parse the arguments
     args = parser.parse_args()
@@ -103,6 +104,7 @@ def parse_args():
     config_args.save = not args.nosave
     config_args.iv3 = args.iv3
     config_args.landmarks = args.landmarks
+    config_args.attention = args.att
     
 
     pprint(config_args)

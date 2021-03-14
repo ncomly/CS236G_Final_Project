@@ -129,21 +129,18 @@ class Generator(nn.Module):
         input_channels: the number of channels to expect from a given input
         output_channels: the number of channels to expect for a given output
     '''
-    def __init__(self, input_channels, output_channels, hidden_channels=64):
+    def __init__(self, input_channels, output_channels, hidden_channels=64, num_res=8):
         super(Generator, self).__init__()
         self.upfeature = FeatureMapBlock(input_channels, hidden_channels)
         self.contract1 = ContractingBlock(hidden_channels)
         self.contract2 = ContractingBlock(hidden_channels * 2)
         res_mult = 4
-        self.res0 = ResidualBlock(hidden_channels * res_mult)
-        self.res1 = ResidualBlock(hidden_channels * res_mult)
-        self.res2 = ResidualBlock(hidden_channels * res_mult)
-        self.res3 = ResidualBlock(hidden_channels * res_mult)
-        self.res4 = ResidualBlock(hidden_channels * res_mult)
-        self.res5 = ResidualBlock(hidden_channels * res_mult)
-        self.res6 = ResidualBlock(hidden_channels * res_mult)
-        self.res7 = ResidualBlock(hidden_channels * res_mult)
-        self.res8 = ResidualBlock(hidden_channels * res_mult)
+
+        # dynamic transformer sizing
+        self.res_blocks = []
+        for i in range(num_res):
+            self.res_blocks.append(ResidualBlock(hidden_channels * res_mult))
+
         self.expand2 = ExpandingBlock(hidden_channels * 4)
         self.expand3 = ExpandingBlock(hidden_channels * 2)
         self.downfeature = FeatureMapBlock(hidden_channels, output_channels)
@@ -157,21 +154,15 @@ class Generator(nn.Module):
         Parameters:
             x: image tensor of shape (batch size, channels, height, width)
         '''
-        x0 = self.upfeature(x)
-        x1 = self.contract1(x0)
-        x2 = self.contract2(x1)
-        x3 = self.res0(x2)
-        x4 = self.res1(x3)
-        x5 = self.res2(x4)
-        x6 = self.res3(x5)
-        x7 = self.res4(x6)
-        x8 = self.res5(x7)
-        x9 = self.res6(x8)
-        x10 = self.res7(x9)
-        x11 = self.res8(x10)
-        x12 = self.expand2(x11)
-        x13 = self.expand3(x12)
-        xn = self.downfeature(x13)
+        x_con = self.upfeature(x)
+        x_con = self.contract1(x_con)
+        x_res = self.contract2(x_con)
+        for res_block in self.res_blocks:
+            x_res = res_block(x_res) 
+
+        x_exp = self.expand2(x_res)
+        x_exp = self.expand3(x_exp)
+        xn = self.downfeature(x_exp)
         return self.tanh(xn)
 
 

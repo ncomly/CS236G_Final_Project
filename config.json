@@ -4,6 +4,7 @@
     "B_subfolder" : "CelebA_50k/downsampled_100/",
     "L_subfolder" : "CelebA_50k/Landmarks/downsampled_100/",
     "lr": 0.0002,
+    "gen_res_blocks": 8,
     "batch_size": 1,
     "epochs": 50,
     "device": "cuda",

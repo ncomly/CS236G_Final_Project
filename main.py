@@ -84,8 +84,8 @@ def main(args):
 
 
     ## Create Generator and Discriminator
-    gen_AB = Generator(dim_A, dim_B).to(args.device)
-    gen_BA = Generator(dim_B, dim_A).to(args.device)
+    gen_AB = Generator(dim_A, dim_B, num_res=args.gen_res_blocks).to(args.device)
+    gen_BA = Generator(dim_B, dim_A, num_res=args.gen_res_blocks).to(args.device)
     gen_opt = torch.optim.Adam(list(gen_AB.parameters()) + list(gen_BA.parameters()), lr=args.lr, betas=(0.5, 0.999))
     disc_A = Discriminator(dim_A).to(args.device)
     disc_A_opt = torch.optim.Adam(disc_A.parameters(), lr=args.lr, betas=(0.5, 0.999))
